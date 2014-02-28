@@ -35,7 +35,7 @@ module Capybara
 
       def angular_app?
         begin
-          page.evaluate_script "(typeof $ != 'undefined') && $('[ng-app]').length > 0"
+          page.evaluate_script "(typeof $ != 'undefined') && (typeof window.angularApp != 'undefined')"
         rescue Capybara::NotSupportedByDriverError
           false
         end
@@ -44,7 +44,7 @@ module Capybara
       def setup_ready
         page.execute_script <<-JS
           window.angularReady = false;
-          var app = $('*[ng-app]');
+          var app = $('body');
           var injector = app.injector();
 
           injector.invoke(function($browser) {
