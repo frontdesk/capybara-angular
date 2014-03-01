@@ -11,7 +11,7 @@ module Capybara
 
       def page
         wait_until_angular_ready
-        Capybara.current_session
+        super
       end
 
       def wait_until_angular_ready
