@@ -15,6 +15,10 @@ module Capybara
         start = Time.now
         until ready?
           timeout! if timeout?(start)
+          if page_reloaded_on_wait?
+            return unless angular_app?
+            setup_ready
+          end
           sleep(0.01)
         end
       end
@@ -22,11 +26,11 @@ module Capybara
       private
 
       def timeout?(start)
-        Time.now - start > Capybara.default_wait_time
+        Time.now - start > Capybara::Angular.default_max_wait_time
       end
 
       def timeout!
-        raise TimeoutError.new("timeout while waiting for angular")
+        raise Timeout::Error.new("timeout while waiting for angular")
       end
 
       def ready?
@@ -34,11 +38,9 @@ module Capybara
       end
 
       def angular_app?
-        begin
-          page.evaluate_script "(typeof $ != 'undefined') && (typeof window.angularApp != 'undefined')"
-        rescue Capybara::NotSupportedByDriverError
-          false
-        end
+        page.evaluate_script "(typeof $ != 'undefined') && (typeof window.angularApp != 'undefined')"
+      rescue Capybara::NotSupportedByDriverError
+        false
       end
 
       def setup_ready
@@ -53,6 +55,10 @@ module Capybara
             });
           });
         JS
+      end
+
+      def page_reloaded_on_wait?
+        page.evaluate_script("window.angularReady === undefined")
       end
     end
   end
