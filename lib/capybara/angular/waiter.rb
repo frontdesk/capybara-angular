@@ -38,11 +38,9 @@ module Capybara
       end
 
       def angular_app?
-        begin
-          page.evaluate_script "(typeof $ != 'undefined') && (typeof window.angularApp != 'undefined')"
-        rescue Capybara::NotSupportedByDriverError
-          false
-        end
+        page.evaluate_script "(typeof $ != 'undefined') && (typeof window.angularApp != 'undefined')"
+      rescue Capybara::NotSupportedByDriverError
+        false
       end
 
       def setup_ready
